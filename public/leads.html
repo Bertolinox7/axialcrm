@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Leads • AxialCRM</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <div class="topbar">
+    <h2>AxialCRM — Leads</h2>
+    <button onclick="logout()">Sair</button>
+  </div>
+
+  <div class="menu">
+    <a href="dashboard.html">🏠 Início</a>
+    <a href="leads.html" class="active">📋 Leads</a>
+  </div>
+
+  <div class="content">
+    <h3>Lista de Leads</h3>
+
+    <table id="leadsTable">
+      <thead>
+        <tr>
+          <th>Nome</th>
+          <th>Telefone</th>
+          <th>Vendedor</th>
+          <th>Status</th>
+          <th>Data</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
