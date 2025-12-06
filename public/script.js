@@ -7,119 +7,121 @@ const API_URL = "https://axialcrm.vercel.app/api/leads"; // sua rota já funcion
 // LOGIN SIMPLES (FAKE)
 // ==========================
 function login() {
-    const email = document.getElementById("email")?.value;
-    const senha = document.getElementById("senha")?.value;
+  const email = document.getElementById("email")?.value;
+  const senha = document.getElementById("senha")?.value;
 
-    if (!email || !senha) {
-        alert("Preencha email e senha.");
-        return;
-    }
+  if (!email || !senha) {
+    alert("Preencha email e senha.");
+    return;
+  }
 
-    // Login simples só para liberar a navegação (versão HTML básica)
-    localStorage.setItem("usuario", email);
+  // Login simples só para liberar a navegação (versão HTML básica)
+  localStorage.setItem("usuario", email);
 
-    window.location.href = "dashboard.html";
+  window.location.href = "dashboard.html";
 }
 
 // ==========================
 // VERIFICAR LOGIN
 // ==========================
 function checkLogin() {
-    const user = localStorage.getItem("usuario");
-    if (!user) {
-        window.location.href = "index.html";
-    }
+  const user = localStorage.getItem("usuario");
+  if (!user) {
+    window.location.href = "index.html";
+  }
 }
 
 // ==========================
 // LOGOUT
 // ==========================
 function logout() {
-    localStorage.removeItem("usuario");
-    window.location.href = "index.html";
+  localStorage.removeItem("usuario");
+  window.location.href = "index.html";
 }
 
 // ==========================
 // LISTAR LEADS DA API
 // ==========================
 async function carregarLeads() {
-    const tabela = document.getElementById("lista-leads");
+  const tbody = document.querySelector("#leadsTable tbody");
+  if (!tbody) return;
 
-    if (!tabela) return;
+  tbody.innerHTML = `<tr><td colspan="5">Carregando...</td></tr>`;
 
-    tabela.innerHTML = "<tr><td>Carregando...</td></tr>";
-
-    try {
-        const response = await fetch(API_URL);
-
-        if (!response.ok) {
-            tabela.innerHTML = `<tr><td>Erro ao carregar leads.</td></tr>`;
-            return;
-        }
-
-        const leads = await response.json();
-
-        if (!Array.isArray(leads) || leads.length === 0) {
-            tabela.innerHTML = "<tr><td>Nenhum lead encontrado.</td></tr>";
-            return;
-        }
-
-        let html = "";
-
-        leads.forEach((lead) => {
-            html += `
-                <tr>
-                    <td>${lead.nome_cliente || "-"}</td>
-                    <td>${lead.telefone || "-"}</td>
-                    <td>${lead.status || "-"}</td>
-                    <td>${lead.created_at ? new Date(lead.created_at).toLocaleString() : "-"}</td>
-                </tr>
-            `;
-        });
-
-        tabela.innerHTML = html;
-
-    } catch (err) {
-        tabela.innerHTML = `<tr><td>Erro de conexão.</td></tr>`;
-        console.error(err);
+  try {
+    const response = await fetch(API_URL); // public-safe endpoint (no secret)
+    if (!response.ok) {
+      tbody.innerHTML = `<tr><td colspan="5">Erro ao carregar leads (${response.status})</td></tr>`;
+      return;
     }
+
+    const json = await response.json();
+    const data = Array.isArray(json?.data) ? json.data : [];
+
+    if (data.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="5">Nenhum lead encontrado.</td></tr>`;
+      return;
+    }
+
+    let html = "";
+    data.forEach((lead) => {
+      html += `
+        <tr>
+          <td>${escapeHtml(lead.nome_cliente || "-")}</td>
+          <td>${escapeHtml(lead.telefone || "-")}</td>
+          <td>${escapeHtml(lead.vendedor_id || "-")}</td>
+          <td>${escapeHtml(lead.status || "-")}</td>
+          <td>${lead.created_at ? new Date(lead.created_at).toLocaleString() : "-"}</td>
+        </tr>
+      `;
+    });
+
+    tbody.innerHTML = html;
+
+  } catch (err) {
+    console.error("Erro ao carregar leads:", err);
+    tbody.innerHTML = `<tr><td colspan="5">Erro de conexão.</td></tr>`;
+  }
 }
 
 // ==========================
-// DASHBOARD — CONTADORES
+// DASHBOARD — CONTADORES (opcional)
+ // tenta preencher se elementos existirem
 // ==========================
 async function carregarDashboard() {
-    const total = document.getElementById("total-leads");
-    const novos = document.getElementById("novos-leads");
-    const andamento = document.getElementById("andamento-leads");
+  const totalEl = document.getElementById("total-leads");
+  const novosEl = document.getElementById("novos-leads");
+  const andamentoEl = document.getElementById("andamento-leads");
+  if (!totalEl && !novosEl && !andamentoEl) return;
 
-    if (!total || !novos || !andamento) return;
+  try {
+    const response = await fetch(API_URL);
+    const json = await response.json();
+    const leads = Array.isArray(json?.data) ? json.data : [];
 
-    try {
-        const response = await fetch(API_URL);
-        const leads = await response.json();
-
-        total.innerText = leads.length;
-        novos.innerText = leads.filter(l => l.status === "novo").length;
-        andamento.innerText = leads.filter(l => l.status === "andamento").length;
-
-    } catch (err) {
-        console.error("Erro ao carregar dashboard:", err);
-    }
+    if (totalEl) totalEl.innerText = leads.length;
+    if (novosEl) novosEl.innerText = leads.filter(l => l.status === "novo").length;
+    if (andamentoEl) andamentoEl.innerText = leads.filter(l => l.status === "andamento").length;
+  } catch (err) {
+    console.error("Erro ao carregar dashboard:", err);
+  }
 }
 
 // ==========================
 // AUTOEXECUÇÃO POR PÁGINA
 // ==========================
+function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c=> ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);}
 
-// Se for a página de leads.html
 if (window.location.pathname.includes("leads.html")) {
-    checkLogin();
-    carregarLeads();
+  checkLogin();
+  carregarLeads();
 }
 
-// Se for o dashboard
 if (window.location.pathname.includes("dashboard.html")) {
-    checkLogin();
-    carregarDashboard();
+  checkLogin();
+  carregarDashboard();
 }
+
+// Exponha funções globais para botões no HTML
+window.login = login;
+window.logout = logout;
