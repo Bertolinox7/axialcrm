@@ -19,34 +19,37 @@
     <div class="form-card">
 
         <label>Nome do Cliente</label>
-        <input id="nome" type="text" placeholder="Ex: Maria Isabel">
+        <input id="lead_nome" type="text" placeholder="Ex: Maria Isabel">
 
         <label>Nicho</label>
-        <input id="nicho" type="text" placeholder="Ex: Carro, Moto, Imóvel">
+        <input id="lead_nicho" type="text" placeholder="Ex: Carro, Moto, Imóvel">
 
         <label>Telefone</label>
-        <input id="telefone" type="text" placeholder="(99) 99999-9999" oninput="formatarTelefone(this)">
+        <input id="lead_telefone" type="text" placeholder="(99) 99999-9999" oninput="formatarTelefone(this)">
 
         <label>Vendedor (ID)</label>
-        <input id="vendedor" type="text" placeholder="Ex: uid do vendedor">
+        <input id="lead_vendedor" type="text" placeholder="Ex: uid do vendedor">
 
         <button class="btn" onclick="salvarLead()">Salvar Lead</button>
+
+        <p id="msgLead" class="result"></p>
     </div>
 
     <hr>
 
-    <h2>Adicionar em Massa</h2>
+    <h2>Adicionar Leads em Massa</h2>
 
     <p class="hint">Formato: <b>nome, telefone</b> — um por linha<br>
     Exemplo:<br>
     João, 11988887777<br>
-    Maria, 41995553322</p>
+    Maria, 41995553322
+    </p>
 
-    <textarea id="massa" rows="10" placeholder="Cole aqui sua lista..."></textarea>
+    <textarea id="massaLista" rows="10" placeholder="Cole aqui sua lista..."></textarea>
 
     <button class="btn" onclick="salvarMassa()">Enviar Lista</button>
 
-    <p id="resultado" class="result"></p>
+    <p id="msgMassa" class="result"></p>
 
 </div>
 
