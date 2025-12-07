@@ -125,3 +125,52 @@ if (window.location.pathname.includes("dashboard.html")) {
 // Exponha funções globais para botões no HTML
 window.login = login;
 window.logout = logout;
+// -----------------------------
+// ADICIONAR LEAD
+// -----------------------------
+const leadForm = document.getElementById("leadForm");
+
+if (leadForm) {
+  leadForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const nome = document.getElementById("nome").value.trim();
+    const telefone = document.getElementById("telefone").value.trim();
+    const vendedorId = document.getElementById("vendedorId").value.trim();
+    const msg = document.getElementById("msg");
+
+    msg.textContent = "Salvando lead...";
+    msg.style.color = "black";
+
+    try {
+      const response = await fetch("/api/leads", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          nome_cliente: nome,
+          telefone: telefone,
+          vendedor_id: vendedorId
+        })
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        msg.textContent = "Erro: " + (result.error || "Falha ao salvar lead.");
+        msg.style.color = "red";
+        return;
+      }
+
+      msg.textContent = "Lead salvo com sucesso!";
+      msg.style.color = "green";
+
+      leadForm.reset();
+
+    } catch (err) {
+      console.error(err);
+      msg.textContent = "Erro inesperado.";
+      msg.style.color = "red";
+    }
+  });
+}
+
