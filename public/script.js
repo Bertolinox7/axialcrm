@@ -211,3 +211,74 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 });
+
+// FORMATAÇÃO AUTOMÁTICA DO TELEFONE
+function formatarTelefone(input) {
+    let v = input.value.replace(/\D/g, "");
+
+    if (v.length >= 2) {
+        v = "(" + v.substring(0, 2) + ") " + v.substring(2);
+    }
+    if (v.length >= 10) {
+        v = v.substring(0, 10) + "-" + v.substring(10, 14);
+    }
+
+    input.value = v;
+}
+
+
+// SALVAR LEAD INDIVIDUAL
+async function salvarLead() {
+    const nome = document.getElementById("nome").value.trim();
+    const nicho = document.getElementById("nicho").value.trim();
+    const telefone = document.getElementById("telefone").value.replace(/\D/g, "");
+    const vendedor = document.getElementById("vendedor").value.trim();
+
+    if (!nome || !telefone || telefone.length < 10) {
+        alert("Preencha corretamente os campos.");
+        return;
+    }
+
+    const body = { nome, nicho, telefone, vendedor_id: vendedor };
+
+    const r = await fetch("/api/leads/add", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+    });
+
+    const data = await r.json();
+    alert(data.message || "Lead salvo!");
+}
+
+
+
+// SALVAR EM MASSA
+async function salvarMassa() {
+    let texto = document.getElementById("massa").value.trim();
+
+    if (!texto) {
+        alert("Cole algum dado!");
+        return;
+    }
+
+    const linhas = texto.split("\n");
+
+    const leads = linhas.map(linha => {
+        const partes = linha.split(",");
+        return {
+            nome: partes[0]?.trim(),
+            telefone: partes[1]?.replace(/\D/g, "").trim()
+        };
+    });
+
+    const r = await fetch("/api/leads/add", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ lista: leads })
+    });
+
+    const data = await r.json();
+    document.getElementById("resultado").textContent = data.message;
+}
+
