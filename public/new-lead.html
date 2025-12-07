@@ -1,49 +1,56 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>AxialCRM — Novo Lead</title>
-<link rel="stylesheet" href="/styles.css" />
+    <meta charset="UTF-8">
+    <title>AxialCRM — Novo Lead</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <header class="topbar">
-    <div class="brand">AxialCRM — Novo Lead</div>
-    <a class="btn-logout" href="/dashboard.html">Sair</a>
-  </header>
 
-  <main class="container">
-    <h1>Adicionar novo Lead</h1>
+<header class="topbar">
+    <h1>AxialCRM — Novo Lead</h1>
+    <button onclick="logout()" class="logout-btn">Sair</button>
+</header>
 
-    <form id="leadForm">
-      <label>Nome do Cliente</label>
-      <input type="text" id="nome_cliente" name="nome_cliente" placeholder="Nome completo" required />
+<div class="container">
 
-      <label>Telefone</label>
-      <input type="tel" id="telefone" name="telefone" placeholder="5511999998888" required />
+    <h2>Adicionar novo Lead</h2>
 
-      <label>Vendedor (ID)</label>
-      <input type="text" id="vendedor_id" name="vendedor_id" placeholder="UUID do vendedor" required />
+    <div class="form-card">
 
-      <label>Feedback / Observações</label>
-      <textarea id="feedback" name="feedback" rows="4" placeholder="Observações do SDR / notas"></textarea>
+        <label>Nome do Cliente</label>
+        <input id="nome" type="text" placeholder="Ex: Maria Isabel">
 
-      <label>Status</label>
-      <select id="status" name="status">
-        <option value="novo">Novo</option>
-        <option value="agendamento">Agendamento</option>
-        <option value="ficha">Ficha</option>
-        <option value="proposta">Proposta</option>
-        <option value="fechado">Fechado</option>
-        <option value="perdido">Perdido</option>
-      </select>
+        <label>Nicho</label>
+        <input id="nicho" type="text" placeholder="Ex: Carro, Moto, Imóvel">
 
-      <button type="submit" id="saveBtn">Salvar Lead</button>
-    </form>
+        <label>Telefone</label>
+        <input id="telefone" type="text" placeholder="(99) 99999-9999" oninput="formatarTelefone(this)">
 
-    <div id="msg" role="status" style="margin-top:16px;"></div>
-  </main>
+        <label>Vendedor (ID)</label>
+        <input id="vendedor" type="text" placeholder="Ex: uid do vendedor">
 
-  <script src="/script.js"></script>
+        <button class="btn" onclick="salvarLead()">Salvar Lead</button>
+    </div>
+
+    <hr>
+
+    <h2>Adicionar em Massa</h2>
+
+    <p class="hint">Formato: <b>nome, telefone</b> — um por linha<br>
+    Exemplo:<br>
+    João, 11988887777<br>
+    Maria, 41995553322</p>
+
+    <textarea id="massa" rows="10" placeholder="Cole aqui sua lista..."></textarea>
+
+    <button class="btn" onclick="salvarMassa()">Enviar Lista</button>
+
+    <p id="resultado" class="result"></p>
+
+</div>
+
+<script src="script.js"></script>
+
 </body>
 </html>
