@@ -6,20 +6,21 @@ export default async function handler(req, res) {
     }
 
     try {
-        // -------------------------
+        // =====================================================
         // 🟦 CADASTRO INDIVIDUAL
-        // -------------------------
+        // =====================================================
         if (!req.body.lista) {
-            let { nome, nicho, telefone, vendedor_id } = req.body;
 
-            if (!nome || !telefone || !vendedor_id) {
+            let { nome_cliente, nicho, telefone, vendedor_id } = req.body;
+
+            if (!nome_cliente || !telefone || !vendedor_id) {
                 return res.status(400).json({ error: "Campos obrigatórios faltando." });
             }
 
-            telefone = telefone.replace(/\D/g, ""); // remove caracteres
+            telefone = telefone.replace(/\D/g, "");
 
             const { error } = await supabase.from("leads").insert({
-                nome_cliente: nome,
+                nome_cliente,
                 nicho,
                 telefone,
                 vendedor_id,
@@ -31,15 +32,22 @@ export default async function handler(req, res) {
             return res.json({ message: "Lead cadastrado com sucesso!" });
         }
 
-        // -------------------------
+        // =====================================================
         // 🟩 CADASTRO EM MASSA
-        // -------------------------
-        const lista = req.body.lista.map(item => ({
-            nome_cliente: item.nome,
-            telefone: item.telefone.replace(/\D/g, ""),
-            vendedor_id: req.body.vendedor_id || null,
-            status: "novo"
-        }));
+        // =====================================================
+
+        const lista = req.body.lista
+            .filter(item => item.nome_cliente && item.telefone) // remove vazios
+            .map(item => ({
+                nome_cliente: item.nome_cliente,
+                telefone: item.telefone.replace(/\D/g, ""),
+                vendedor_id: req.body.vendedor_id || null,
+                status: "novo"
+            }));
+
+        if (!lista.length) {
+            return res.status(400).json({ error: "Nenhum dado válido para inserir." });
+        }
 
         const { error } = await supabase.from("leads").insert(lista);
 
@@ -51,4 +59,3 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: err.message });
     }
 }
-
