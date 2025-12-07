@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Adicionar Lead — AxialCRM</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <nav class="navbar">
+    <div class="navbar-brand">AxialCRM — Novo Lead</div>
+    <button class="logout-btn" onclick="logout()">Sair</button>
+  </nav>
+
+  <div class="container">
+    <h2>Adicionar novo Lead</h2>
+
+    <form id="leadForm" class="form">
+      <label>Nome do Cliente</label>
+      <input type="text" id="nome" placeholder="Ex: João da Silva" required />
+
+      <label>Telefone</label>
+      <input type="text" id="telefone" placeholder="Ex: 5511999999999" required />
+
+      <label>Vendedor (ID)</label>
+      <input type="text" id="vendedorId" placeholder="Seu ID no Supabase" required />
+
+      <button type="submit" class="btn-primary">Salvar Lead</button>
+    </form>
+
+    <p id="msg" class="msg"></p>
+
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
