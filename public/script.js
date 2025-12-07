@@ -174,3 +174,40 @@ if (leadForm) {
   });
 }
 
+// Adicione ao final de public/script.js
+
+document.addEventListener('DOMContentLoaded', () => {
+  const form = document.getElementById('leadForm');
+  const msg = document.getElementById('msg');
+
+  if (form) {
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      msg.textContent = 'Salvando...';
+
+      const payload = {
+        nome_cliente: document.getElementById('nome_cliente').value.trim(),
+        telefone: document.getElementById('telefone').value.trim(),
+        vendedor_id: document.getElementById('vendedor_id').value.trim(),
+        feedback: document.getElementById('feedback').value.trim(),
+        status: document.getElementById('status').value
+      };
+
+      try {
+        const res = await fetch('/api/leads/add', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await res.json();
+        if (!res.ok) throw new Error(data?.error || 'Erro desconhecido');
+
+        msg.textContent = 'Lead salvo com sucesso.';
+        form.reset();
+      } catch (err) {
+        msg.textContent = 'Erro: ' + err.message;
+      }
+    });
+  }
+});
