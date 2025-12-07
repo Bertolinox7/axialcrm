@@ -1,51 +1,37 @@
+import { supabase } from "../../lib/supabase.js";
+
 export default async function handler(req, res) {
-  if (req.method !== "POST") {
-    return res.status(405).json({ error: "Use POST" });
-  }
-
-  try {
-    const { nome_cliente, nicho, telefone, vendedor_id, feedback = "", status = "novo" } = req.body;
-
-    if (!nome_cliente || !telefone || !vendedor_id) {
-      return res.status(400).json({ error: "Campos obrigatórios ausentes." });
+    if (req.method !== "POST") {
+        return res.status(405).json({ error: "Method not allowed. Use POST." });
     }
 
-    // FORMATAR TELEFONE PARA (99) 99999-9999
-    const onlyNumbers = telefone.replace(/\D/g, "");
-    const ddd = onlyNumbers.substring(0, 2);
-    const number = onlyNumbers.substring(2);
-    const formattedPhone = `(${ddd}) ${number.substring(0, 5)}-${number.substring(5)}`;
+    try {
+        // MODO INDIVIDUAL
+        if (!req.body.lista) {
+            const lead = req.body;
 
-    const payload = {
-      nome_cliente,
-      nicho: nicho || "",
-      telefone: formattedPhone,
-      vendedor_id,
-      feedback,
-      status
-    };
+            const { error } = await supabase.from("leads").insert(lead);
 
-    const insertRes = await fetch(`${process.env.SUPABASE_URL}/rest/v1/leads`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        apikey: process.env.SUPABASE_SERVICE_ROLE_KEY,
-        Authorization: `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}`
-      },
-      body: JSON.stringify(payload)
-    });
+            if (error) throw error;
 
-    const data = await insertRes.json();
+            return res.json({ message: "Lead cadastrado com sucesso!" });
+        }
 
-    if (!insertRes.ok) {
-      return res.status(500).json({ error: data });
+        // MODO EM MASSA
+        const lista = req.body.lista.map(x => ({
+            nome_cliente: x.nome,
+            telefone: x.telefone,
+            vendedor_id: req.body.vendedor || null
+        }));
+
+        const { error } = await supabase.from("leads").insert(lista);
+
+        if (error) throw error;
+
+        return res.json({ message: "Leads cadastrados em massa com sucesso!" });
+
+    } catch (err) {
+        return res.status(400).json({ error: err.message });
     }
-
-    return res.status(201).json({ success: true, data });
-    
-  } catch (err) {
-    console.error("SERVER ERROR:", err);
-    return res.status(500).json({ error: "Erro interno no servidor." });
-  }
 }
 
